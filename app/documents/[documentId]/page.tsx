@@ -7,7 +7,7 @@ import { Usable } from "react";
 import ChatPanel from "./chat-panel";
 
 
-const page = ({params}:{params:Usable<{ documentId:Id<"documents">}>}) => {
+const DocumentPage = ({params}:{params:Usable<{ documentId:Id<"documents">}>}) => {
 
   const resolvedParams=use(params)
 
@@ -44,4 +44,4 @@ const page = ({params}:{params:Usable<{ documentId:Id<"documents">}>}) => {
   )
 }
 
-export default page
+export default DocumentPage
