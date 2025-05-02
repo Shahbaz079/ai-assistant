@@ -7,11 +7,11 @@ import { Usable } from "react";
 import ChatPanel from "./chat-panel";
 
 
-const DocumentPage = ({params}:{params:Usable<{ documentId:Id<"documents">}>}) => {
+const DocumentPage = ({ params }: { params: { documentId: Id<"documents"> } }) => {
 
-  const resolvedParams=use(params)
-
-  const document=useQuery(api.documents.getDocument, {documentId: resolvedParams.documentId})
+ 
+  
+  const document=useQuery(api.documents.getDocument, {documentId:params.documentId})
 
   if(!document) {
     return <div>You do not have access for this file</div>
