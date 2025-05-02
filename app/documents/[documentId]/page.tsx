@@ -5,13 +5,20 @@ import { Id } from "@/convex/_generated/dataModel";
 import {use} from "react"; 
 import { Usable } from "react";
 import ChatPanel from "./chat-panel";
+import { useParams } from "next/navigation"; 
 
 
-const DocumentPage = ({ params }: { params: { documentId: Id<"documents"> } }) => {
+const DocumentPage = () => {
 
- 
+   // Fetch the documentId using the useParams hook
+   const { documentId } = useParams();
+
+   // Make sure documentId exists before using it
+   if (!documentId) {
+     return <div>Document ID is missing.</div>;
+   }
   
-  const document=useQuery(api.documents.getDocument, {documentId:params.documentId})
+  const document = useQuery(api.documents.getDocument, { documentId: documentId as Id<"documents"> });
 
   if(!document) {
     return <div>You do not have access for this file</div>
