@@ -1,6 +1,6 @@
 import { action, mutation, query } from "./_generated/server";
 import {ConvexError, v} from "convex/values"
-import {api} from "./_generated/api"
+
 
 
 
@@ -104,7 +104,14 @@ export const askHuggingFace = action({
   
 
     const HF_API_KEY = process.env.HF_API_KEY!;
-    const model = "mistralai/Mistral-7B-Instruct-v0.1";
+
+if (!HF_API_KEY) throw new ConvexError("Missing Hugging Face API key in Convex environment.");
+
+console.log("document:",documentText.slice(0, 1000))
+console.log("question:",question)
+
+
+    const model ="deepset/roberta-base-squad2"
 
     const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
       method: "POST",
@@ -112,15 +119,31 @@ export const askHuggingFace = action({
         Authorization: `Bearer ${HF_API_KEY}`,
         "Content-Type": "application/json",
       },
+   
+
       body: JSON.stringify({
-        inputs: `Answer the question based on the document provided. If the answer is not in the document, say "I don't know".\n\nQuestion: ${question}\n\nDocument: ${documentText}`
+        inputs: {
+          question: question,
+          context: documentText
+        }
       }),
+
     });
 
-    const data = await response.json();
+    const rawText = await response.text();
 
-    if (data.error) throw new ConvexError(data.error);
-    return { answer: data[0]?.generated_text || "No answer received." };
+console.log("RAW response:", rawText);
+
+try {
+  const data = JSON.parse(rawText);
+  if (data.error) throw new ConvexError(data.error);
+  return { answer: data.answer || "No answer received." };
+} catch (err) {
+  throw new ConvexError("Invalid JSON returned from Hugging Face");
+}
+
+
+   
   },
 });
 
