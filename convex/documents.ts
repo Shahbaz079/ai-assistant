@@ -60,9 +60,10 @@ export const createDocument = mutation({
   },
 
 })
-
+{/*
 export const askQuestion=action({
   args:{
+    question: v.string(),
     documentId: v.id("documents"),
   },
   async handler (ctx, args) {
@@ -82,12 +83,46 @@ export const askQuestion=action({
 
       })
 
-      return chatCompletion.choices[0].message.content
+    
 
 
 
   } 
 })
+*/}
+
+export const askHuggingFace = action({
+  args: {
+    question: v.string(),
+    documentText: v.string(),
+  },
+  handler: async (ctx, { question, documentText }) => {
+
+    const userId=(await ctx.auth.getUserIdentity())?.tokenIdentifier
+    if(!userId) throw new ConvexError("User not authenticated")
+
+  
+
+    const HF_API_KEY = process.env.HF_API_KEY!;
+    const model = "mistralai/Mistral-7B-Instruct-v0.1";
+
+    const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${HF_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        inputs: `Answer the question based on the document provided. If the answer is not in the document, say "I don't know".\n\nQuestion: ${question}\n\nDocument: ${documentText}`
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.error) throw new ConvexError(data.error);
+    return { answer: data[0]?.generated_text || "No answer received." };
+  },
+});
 
 
 

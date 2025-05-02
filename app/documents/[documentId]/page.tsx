@@ -4,6 +4,7 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import {use} from "react"; 
 import { Usable } from "react";
+import ChatPanel from "./chat-panel";
 
 
 const page = ({params}:{params:Usable<{ documentId:Id<"documents">}>}) => {
@@ -33,11 +34,9 @@ const page = ({params}:{params:Usable<{ documentId:Id<"documents">}>}) => {
          
           
         </div>
-
-        <div className="w-[30vw] h-[80vh] bg-gray-200  text-black rounded-lg overflow-hidden shadow-lg">
-          chatbot
-        </div>
-
+{       document?.documentUrl &&
+      <ChatPanel documentUrl={document.documentUrl}/>
+}
             </div>   
 
       </div>
