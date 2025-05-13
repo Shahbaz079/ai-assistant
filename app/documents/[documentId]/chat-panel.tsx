@@ -19,7 +19,7 @@ const ChatPanel = ({ documentUrl }: { documentUrl: string }) => {
     try {
       const documentText = await extractTextFromPdfUrl(documentUrl);
       const result = await askHuggingFace({ question, documentText });
-      setAnswer(result.answer);
+      setAnswer(result?.answer);
     } catch (err: any) {
       console.error(err);
       setAnswer("Something went wrong.");

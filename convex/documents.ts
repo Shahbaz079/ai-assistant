@@ -107,42 +107,36 @@ export const askHuggingFace = action({
 
 if (!HF_API_KEY) throw new ConvexError("Missing Hugging Face API key in Convex environment.");
 
-console.log("document:",documentText.slice(0, 1000))
-console.log("question:",question)
 
 
-    const model ="deepset/roberta-base-squad2"
 
-    const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${HF_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-   
 
-      body: JSON.stringify({
-        inputs: {
-          question: question,
-          context: documentText
-        }
-      }),
+    const prompt = `<s>[INST] Use the context to answer the question.\n\nContext: ${documentText}\n\nQuestion: ${question} [/INST]`;
 
-    });
 
-    const rawText = await response.text();
+    const res = await fetch("https://d449-34-126-124-90.ngrok-free.app/generate", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({prompt })
+});
+const data = await res.json();
+console.log("fullData",data);
 
-console.log("RAW response:", rawText);
+const rawText = data.response;
+
+
 
 try {
-  const data = JSON.parse(rawText);
-  if (data.error) throw new ConvexError(data.error);
-  return { answer: data.answer || "No answer received." };
+
+if (data.error) throw new ConvexError(data.error);
+const answer = data.response|| data || "No answer found.";
+return { answer };
+ 
+
 } catch (err) {
+  console.error("Raw response:", rawText); // <-- helpful debug
   throw new ConvexError("Invalid JSON returned from Hugging Face");
 }
-
-
    
   },
 });
